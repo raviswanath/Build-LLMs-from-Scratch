@@ -1,6 +1,6 @@
 import torch.nn as nn
-from FeedForward import FeedForward
-from LayerNorm import LayerNorm
+from L4.FeedForward import FeedForward
+from L4.LayerNorm import LayerNorm
 from L3.MultiHeadedAttention import MultiHeadedAttention
 
 
