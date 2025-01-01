@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch 
 from FeedForward import FeedForward
 from LayerNorm import LayerNorm
 from L3.MultiHeadedAttention import MultiHeadedAttention
