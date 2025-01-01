@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from Transformer import TransformerBlock
-from LayerNorm import LayerNorm
+from L4.Transformer import TransformerBlock
+from L4.LayerNorm import LayerNorm
 import tiktoken
 
 
