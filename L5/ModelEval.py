@@ -48,6 +48,35 @@ def token_to_text(token_ids, tokenizer):
     return decoded
 
 
+def calc_loss_batch(input_batch, target_batch, model, device):
+    input_batch = input_batch.to(device)
+    target_batch = target_batch.to(device)
+    logits = model(input_batch)
+    loss = nn.functional.cross_entropy(
+        logits.flatten(0, 1), target_batch.flatten()
+    )
+    return loss 
+
+
+
+def calc_loss_loader(data_loader, model, device, num_batches=None):
+    total_loss = 0.
+    if len(data_loader) == 0:
+        return float("nan")
+    elif num_batches is None:
+        num_batches = len(data_loader)
+    else: 
+        num_batches = min(num_batches, len(data_loader))
+
+    for i, (input_batch, target) in enumerate(data_loader):
+        if i < num_batches:
+            loss = calc_loss_batch(input_batch, target, model, device)
+            total_loss += loss 
+        else:
+            break 
+    return total_loss / num_batches
+
+
 start_context = "Every effort moves you"
 tokenizer = tiktoken.get_encoding("gpt2")
 model = GPTModel(gpt_config)
@@ -85,10 +114,10 @@ val_loader = create_dataloader_v1(
     num_workers=0
 )
 
-print("Train loader:")
-for x, y in train_loader:
-    print(x.shape, y.shape)
-    
-print("\nValidation loader:")
-for x, y in val_loader:
-    print(x.shape, y.shape)
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu") 
+model.to(device)
+with torch.no_grad():
+    train_loss = calc_loss_loader(train_loader, model, device)
+    val_loss = calc_loss_loader(val_loader, model, device)
+print("Training loss:", train_loss)
+print("Validation loss:", val_loss)
