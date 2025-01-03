@@ -11,7 +11,7 @@ from L2.Encodings import create_dataloader_v1
 
 torch.manual_seed(123)
 
-# Config dictionary for GTPT-2 model 
+# Config dictionary for GPT-2 model
 gpt_config = {
     "vocab_size": 50257,
     "context_length": 256,
@@ -36,6 +36,7 @@ def generate_text_simple(model, idx, max_new_tokens, context_size):
         idx = torch.cat((idx, idx_next), dim=-1)
     return idx
 
+
 def text_to_token(text, tokenizer):
     encoded = tokenizer.encode(text, allowed_special={'<|endoftext|>'})
     encoded_tensor = torch.tensor(encoded).unsqueeze(0)  # adds batch dimension
@@ -58,7 +59,6 @@ def calc_loss_batch(input_batch, target_batch, model, device):
     return loss 
 
 
-
 def calc_loss_loader(data_loader, model, device, num_batches=None):
     total_loss = 0.
     if len(data_loader) == 0:
@@ -77,11 +77,31 @@ def calc_loss_loader(data_loader, model, device, num_batches=None):
     return total_loss / num_batches
 
 
+def evaluate_model(model, train_loader, val_loader, device, eval_iter):
+    model.eval()
+    with torch.no_grad():
+        train_loss = calc_loss_loader(train_loader, model, device, num_batches=eval_iter)
+        val_loss = calc_loss_loader(val_loader, model, device, num_batches=eval_iter)
+    model.train()
+    return train_loss, val_loss
+
+
+def generate_and_print_sample(model, tokenizer, device, start_context):
+    model.eval()
+    context_size = model.pos_emb.weight.shape[0]
+    encoded = text_to_token(start_context, tokenizer).to(device)
+    with torch.no_grad()
+        token_ids = generate_text_simple(model, encoded, 50, context_size)
+    decoded_text = token_to_text(token_ids, tokenizer)
+    print(decoded_text.replace("\n", " "))
+    model.train()
+
+
 start_context = "Every effort moves you"
 tokenizer = tiktoken.get_encoding("gpt2")
 model = GPTModel(gpt_config)
 
-filepath = '/Users/aadithyaviswanathr/Python Scripts/Build LLM from Scratch/Build-LLMs-from-Scratch/L2/the-verdict.txt'
+filepath = 'L2/the-verdict.txt'
 with open(filepath, "r", encoding="utf-8") as file:
     text_data = file.read()
 
