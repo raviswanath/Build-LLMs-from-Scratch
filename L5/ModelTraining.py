@@ -8,7 +8,7 @@ import tiktoken
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from L4.GPTModel import GPTModel
 from L2.Encodings import create_dataloader_v1
-from L5.ModelEval import calc_loss_loader
+import L5.ModelEval as ut 
 
 torch.manual_seed(123)
 
@@ -22,8 +22,6 @@ gpt_config = {
     "drop_rate": 0.1,
     "qkv_bias": False
 }
-
-
 
 start_context = "Every effort moves you"
 tokenizer = tiktoken.get_encoding("gpt2")
@@ -62,10 +60,36 @@ val_loader = create_dataloader_v1(
     num_workers=0
 )
 
-device = torch.device("mps" if torch.backends.mps.is_available() else "cpu") 
+device = "cpu" #torch.device("mps" if torch.backends.mps.is_available() else "cpu") 
 model.to(device)
-with torch.no_grad():
-    train_loss = calc_loss_loader(train_loader, model, device)
-    val_loss = calc_loss_loader(val_loader, model, device)
-print("Training loss:", train_loss)
-print("Validation loss:", val_loss)
+
+optimizer = torch.optim.AdamW(
+    model.parameters(), lr=0.004, 
+    weight_decay=0.1
+)
+num_epochs = 10
+train_losses, val_losses, tokens_seen = ut.train_model_simple(model, train_loader, val_loader,
+                                                              optimizer, device, num_epochs, eval_freq=5,
+                                                              eval_iter=5, start_context="Every effort moves you", 
+                                                              tokenizer=tokenizer)
+
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
+def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
+    fig, ax1 = plt.subplots(figsize=(5, 3))
+    ax1.plot(epochs_seen, train_losses, label="Training loss")
+    ax1.plot(
+        epochs_seen, val_losses, linestyle="-.", label="Validation loss"
+    )
+    ax1.set_xlabel("Epochs")
+    ax1.set_ylabel("Loss")
+    ax1.legend(loc="upper right")
+    ax1.xaxis.set_major_locator(MaxNLocator(integer=True))
+    ax2 = ax1.twiny()
+    ax2.plot(tokens_seen, train_losses, alpha=0)
+    ax2.set_xlabel("Tokens seen")
+    fig.tight_layout()
+    plt.show()
+
+epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
+plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
