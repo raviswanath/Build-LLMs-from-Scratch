@@ -87,7 +87,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer,
     train_losses, val_losses, track_tokens_seen = [], [], []
     tokens_seen, global_step = 0, -1 
 
-    for epoch in num_epochs:
+    for epoch in range(num_epochs):
         model.train()
         for input_batch, target_batch in train_loader:
             optimizer.zero_grad()
@@ -97,7 +97,7 @@ def train_model_simple(model, train_loader, val_loader, optimizer,
             tokens_seen += input_batch.numel()
             global_step += 1
 
-            if epoch % eval_freq == 0:
+            if global_step % eval_freq == 0:
                 train_loss, val_loss = evaluate_model(model, train_loader, val_loader, device, eval_iter)
                 train_losses.append(train_loss)
                 val_losses.append(val_loss)
@@ -107,6 +107,6 @@ def train_model_simple(model, train_loader, val_loader, optimizer,
                       f"Val loss {val_loss:.3f}")
         
         generate_and_print_sample(
-        model, tokenizer, device, start_context)
+                model, tokenizer, device, start_context)
 
     return train_losses, val_losses, track_tokens_seen
