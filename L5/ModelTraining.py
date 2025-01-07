@@ -93,6 +93,8 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     fig.tight_layout()
     plt.show()
 
-
-epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
+import numpy as np
+epochs_tensor = np.linspace(0, num_epochs, len(train_losses))
+train_losses = [i.item() for i in train_losses]
+val_losses = [x.item() for x in val_losses]
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
