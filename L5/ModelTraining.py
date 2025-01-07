@@ -60,11 +60,11 @@ val_loader = create_dataloader_v1(
     num_workers=0
 )
 
-device = "cpu" #torch.device("mps" if torch.backends.mps.is_available() else "cpu") 
+device = torch.device("mps" if torch.backends.mps.is_available() else "cpu") 
 model.to(device)
 
 optimizer = torch.optim.AdamW(
-    model.parameters(), lr=0.004, 
+    model.parameters(), lr=0.0004, 
     weight_decay=0.1
 )
 num_epochs = 10
