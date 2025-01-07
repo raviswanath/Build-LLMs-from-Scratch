@@ -75,6 +75,8 @@ train_losses, val_losses, tokens_seen = ut.train_model_simple(model, train_loade
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
+
+
 def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     fig, ax1 = plt.subplots(figsize=(5, 3))
     ax1.plot(epochs_seen, train_losses, label="Training loss")
@@ -90,6 +92,7 @@ def plot_losses(epochs_seen, tokens_seen, train_losses, val_losses):
     ax2.set_xlabel("Tokens seen")
     fig.tight_layout()
     plt.show()
+
 
 epochs_tensor = torch.linspace(0, num_epochs, len(train_losses))
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
