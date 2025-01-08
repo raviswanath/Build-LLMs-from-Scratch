@@ -110,3 +110,48 @@ def train_model_simple(model, train_loader, val_loader, optimizer,
                 model, tokenizer, device, start_context)
 
     return train_losses, val_losses, track_tokens_seen
+
+
+def print_sampled_tokens(probas):
+    torch.manual_seed(123)
+    sample = [torch.multinomial(probas, num_samples=1).item() for i in range(1000)]
+    sample_ids = torch.bincount(torch.tensor(sample))
+
+    for i, freq in enumerate(sample_ids):
+        print(f"{freq} x token_id {i}")
+
+
+def softmax_with_temperature(logits, temperature):
+    scaled_logits = logits / temperature
+    return torch.softmax(scaled_logits, dim=0)
+
+
+def generate(model, idx, max_new_tokens, context_size, 
+             temperature=0.0, top_k=None, eos_id=None):
+    
+    for _ in range(max_new_tokens):
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+        logits = logits[:, -1, :]
+        
+        if top_k is not None:
+            top_logits, _ = torch.topk(logits, top_k)
+            min_value = top_logits[:, -1]
+            logits = torch.where(
+                logits < min_value, 
+                torch.tensor(float('-inf')).to(logits.device), 
+                logits
+            )
+        
+        if temperature > 0.0:
+            logits = logits / temperature
+            probs = torch.softmax(logits, dim=-1)
+            idx_next = torch.multinomial(probs, num_samples=1)
+        else: 
+            idx_next = torch.argmax(logits, dim=-1, keepdim=True)
+        
+        if idx_next == eos_id:
+            break 
+        idx = torch.cat((idx, idx_next), dim=1)
+    return idx 
