@@ -98,3 +98,10 @@ epochs_tensor = np.linspace(0, num_epochs, len(train_losses))
 train_losses = [i.item() for i in train_losses]
 val_losses = [x.item() for x in val_losses]
 plot_losses(epochs_tensor, tokens_seen, train_losses, val_losses)
+
+torch.save({
+    "model_state_dict": model.state_dict(), 
+    "optimizer_state_dict": optimizer.state_dict()
+},
+"model_and_optimizer.pth" 
+)
