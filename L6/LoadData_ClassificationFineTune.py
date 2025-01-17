@@ -62,6 +62,6 @@ balanced_df["Label"] = balanced_df["Label"].map({"ham": 0, "spam": 1})
 
 train_df, validation_df, test_df = random_split(balanced_df, 0.7, 0.1)
 
-print(train_df.shape)
-print(validation_df.shape)
-print(test_df.shape)
+train_df.to_csv("L6/train_df.csv", index=None)
+validation_df.to_csv("L6/val_df.csv", index=None)
+test_df.to_csv("L6/test_df.csv", index=None)
