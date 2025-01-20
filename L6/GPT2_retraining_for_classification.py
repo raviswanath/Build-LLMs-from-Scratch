@@ -122,3 +122,27 @@ def plot_values(epochs_seen, examples_seen, train_values, val_values, label="los
 
     fig.tight_layout()
     plt.show()
+
+
+def classify_review(text, model, tokenizer, device, max_length=120, pad_token_id=50266):
+    model.to(device)
+    model.eval()
+
+    input_ids = tokenizer.encode(text)
+ 
+    # using th GPT2 Model head from transformers lib
+    supported_context_length = model.transformer.wpe.weight.shape[0]
+
+    # truncate to only allow max context length
+    input_ids = input_ids[:min(max_length, supported_context_length)]
+
+
+    # pad the tokens if input is shorter
+    input_ids += [pad_token_id] * (max_length - len(input_ids))
+    input_tensor = torch.tensor(input_ids, device=device).unsqueeze(0)
+
+    with torch.no_grad():
+        logits = model(input_tensor).logits[:, -1, :]
+    predicted_label = torch.argmax(logits, dim=-1).item()
+
+    return "spam" if predicted_label == 1 else "not spam"
