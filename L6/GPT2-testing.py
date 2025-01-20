@@ -7,7 +7,7 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 # Add the root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from L6.SpamDataLoader import train_loader, val_loader, test_loader
-from L6.GPT2_retraining_for_classification import train_classifier_simple, plot_values
+from L6.GPT2_retraining_for_classification import train_classifier_simple, plot_values, calc_accuracy_loader
 
 # Load the tokenizer and model
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -52,15 +52,12 @@ val_losses = [i.item() for i in val_losses]
 plot_values(epochs_tensor, ex_seen_tensor, train_losses, val_losses)
 
 
-# with torch.no_grad():
-#     train_loss = calc_loader_loss(train_loader, model, device, num_batches=5)
-#     val_loss = calc_loader_loss(val_loader, model, device, num_batches=5)
-#     test_loss = calc_loader_loss(test_loader, model, device, num_batches=5)
+train_accuracy = calc_accuracy_loader(train_loader, model, device=device, num_batches=10)
+val_accuracy = calc_accuracy_loader(val_loader, model, device=device, num_batches=10)
+test_accuracy = calc_accuracy_loader(test_loader, model, device=device, num_batches=10)
 
-# train_accuracy = calc_accuracy_loader(train_loader, model, device=device, num_batches=10)
-# val_accuracy = calc_accuracy_loader(val_loader, model, device=device, num_batches=10)
-# test_accuracy = calc_accuracy_loader(test_loader, model, device=device, num_batches=10)
+torch.save(model.state_dict(), "review_classifier.pth")
 
-# print(f"Training Loss {train_loss:.2f}")
-# print(f"Validation Loss {val_loss:.2f}")
-# print(f"Test Loss {test_loss:.2f}")
+# print(f"Training Accuracy {train_accuracy:.2f}")
+# print(f"Validation Accuracy {val_accuracy:.2f}")
+# print(f"Test Accuracy {test_accuracy:.2f}")
