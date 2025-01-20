@@ -7,7 +7,7 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 # Add the root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from L6.SpamDataLoader import train_loader, val_loader, test_loader
-from L6.GPT2_retraining_for_classification import train_classifier_simple, plot_values, calc_accuracy_loader
+from L6.GPT2ClassificationRetraining_functions import train_classifier_simple, plot_values, calc_accuracy_loader
 
 # Load the tokenizer and model
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
