@@ -8,6 +8,7 @@ from transformers import GPT2Tokenizer, GPT2LMHeadModel
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from L6.SpamDataLoader import train_loader, val_loader, test_loader
 from L6.GPT2ClassificationRetraining_functions import train_classifier_simple, plot_values, calc_accuracy_loader
+from L6.GPT2ClassificationRetraining_functions import classify_review
 
 # Load the tokenizer and model
 device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -61,3 +62,20 @@ torch.save(model.state_dict(), "review_classifier.pth")
 # print(f"Training Accuracy {train_accuracy:.2f}")
 # print(f"Validation Accuracy {val_accuracy:.2f}")
 # print(f"Test Accuracy {test_accuracy:.2f}")
+
+text_1 = (
+    "You are a winner you have been specially"
+    " selected to receive $1000 cash or a $2000 award."
+)
+print(classify_review(
+    text_1, model, tokenizer, device, max_length=120
+))
+
+
+text_2 = (
+    "Hey, just wanted to check if we're still on"
+    " for dinner tonight? Let me know!"
+)
+print(classify_review(
+    text_2, model, tokenizer, device, max_length=120
+))
