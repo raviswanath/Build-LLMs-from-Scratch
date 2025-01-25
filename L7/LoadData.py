@@ -1,6 +1,6 @@
 import json
 import os
-import urllib
+import urllib.request
 
 
 def download_and_load_file(file_path, url):
