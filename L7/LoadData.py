@@ -3,7 +3,7 @@ import sys
 import torch 
 # Add the root directory to sys.path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from L7.LoadData import data
+from L7.DownloadData import data
 from L7.UtilFunctions import format_input, InstructionDataset, custom_collate
 from torch.utils.data import DataLoader
 import tiktoken 
@@ -24,9 +24,9 @@ train_data = data[:train_len]
 test_data = data[train_len : train_len + test_len]
 val_data = data[train_len + test_len :]
 
-print("Training set length:", len(train_data))
-print("Validation set length:", len(val_data))
-print("Test set length:", len(test_data))
+# print("Training set length:", len(train_data))
+# print("Validation set length:", len(val_data))
+# print("Test set length:", len(test_data))
 
 customized_collate_function = partial(
     custom_collate, 
@@ -50,7 +50,25 @@ train_loader = DataLoader(
     num_workers=num_workers
 )
 
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=batch_size,
+    collate_fn=customized_collate_function, 
+    shuffle=True,
+    drop_last=False, 
+    num_workers=num_workers
+)
 
-print("Train loader:")
-for inputs, targets in train_loader:
-    print(inputs.shape, targets.shape)
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=batch_size,
+    collate_fn=customized_collate_function, 
+    shuffle=True,
+    drop_last=False, 
+    num_workers=num_workers
+)
+
+
+# print("Train loader:")
+# for inputs, targets in train_loader:
+#     print(inputs.shape, targets.shape)
