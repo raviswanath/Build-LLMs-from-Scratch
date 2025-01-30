@@ -14,7 +14,7 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 model_input = format_input(data[50])
 desired_response = f"\n\n### Response:\n{data[50]['output']}"
-print(model_input + desired_response)
+# print(model_input + desired_response)
 
 train_len = int(len(data) * 0.85) 
 test_len = int(len(data) * 0.1) 
