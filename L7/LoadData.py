@@ -14,7 +14,6 @@ device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
 
 model_input = format_input(data[50])
 desired_response = f"\n\n### Response:\n{data[50]['output']}"
-# print(model_input + desired_response)
 
 train_len = int(len(data) * 0.85) 
 test_len = int(len(data) * 0.1) 
@@ -23,10 +22,6 @@ val_len = train_len - test_len
 train_data = data[:train_len]
 test_data = data[train_len : train_len + test_len]
 val_data = data[train_len + test_len :]
-
-# print("Training set length:", len(train_data))
-# print("Validation set length:", len(val_data))
-# print("Test set length:", len(test_data))
 
 customized_collate_function = partial(
     custom_collate, 
@@ -67,8 +62,3 @@ test_loader = DataLoader(
     drop_last=False, 
     num_workers=num_workers
 )
-
-
-# print("Train loader:")
-# for inputs, targets in train_loader:
-#     print(inputs.shape, targets.shape)
